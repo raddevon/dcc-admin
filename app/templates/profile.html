@@ -2,7 +2,7 @@
 {% block content %}
     <div>
         <h2>Profile</h2>
-        <h3>User {{ session['email'] }} is logged in.</h3>
+        <h3>User {{ current_user.email }} is logged in.</h3>
         <a href="{{ url_for('index') }}">Home</a>
     </div>
 {% endblock %}

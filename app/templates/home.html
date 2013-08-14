@@ -2,11 +2,11 @@
 
 {% block content %}
     <h1>Home</h1>
-    {% if 'email' in session %}
-        <h3>Welcome, {{ session['email'] }}</h3>
+    {% if current_user.is_authenticated() %}
+        <h3>Welcome, {{ current_user.email }}</h3>
     {% endif %}
     <ul>
-        {% if 'email' in session %}
+        {% if current_user.is_authenticated() %}
             <li><a href="{{ url_for('profile') }}">Profile</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         {% else %}

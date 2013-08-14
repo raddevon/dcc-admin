@@ -8,9 +8,9 @@ app.config.from_object('config')
 
 # Flask-Login
 login_manager = LoginManager()
-login_manager(app)
+login_manager.init_app(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 
-from app import views
+from app import views, auth
