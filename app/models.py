@@ -53,8 +53,18 @@ class User(db.Model):
     pwdhash = db.Column(db.String(100))
     roles = db.relationship('Role', secondary=user_role_table, backref='users')
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, roles=None):
         self.email = email.lower()
+        if roles:
+            role_list = []
+            for role in roles:
+                role_list.appen(Role.query.filter_by(name=role).first())
+            self.roles = role_list
+        else:
+            r = Role('user')
+            db.session.add(r)
+            db.session.commit()
+            self.roles = [r]
         self.set_password(password)
 
     def set_password(self, password):
