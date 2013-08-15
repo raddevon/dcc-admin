@@ -4,14 +4,14 @@ from werkzeug import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 
-user_role_table = db.Table('user_role', db.Base.metadata,
+user_role_table = db.Table('user_role',
                            db.Column(
-                               'user_id', db.Integer, db.ForeignKey('user.id')),
+                               'user_id', db.Integer, db.ForeignKey('user.uid')),
                            db.Column(
                            'role_id', db.Integer, db.ForeignKey('role.id'))
                            )
 
-role_ability_table = db.Table('role_ability', db.Base.metadata,
+role_ability_table = db.Table('role_ability',
                               db.Column(
                                   'role_id', db.Integer, db.ForeignKey('role.id')),
                               db.Column(
@@ -23,8 +23,8 @@ class User(db.Model):
     __tablename__ = 'user'
     uid = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True)
-    pwdhash = db.Column(db.String(54))
-    roles = db.relationship('role', secondary=user_role_table, backref='users')
+    pwdhash = db.Column(db.String(100))
+    roles = db.relationship('Role', secondary=user_role_table, backref='users')
 
     def __init__(self, email, password):
         self.email = email.lower()
@@ -57,7 +57,7 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True)
     abilities = db.relationship(
-        'ability', secondary=role_ability_table, backref='roles')
+        'Ability', secondary=role_ability_table, backref='roles')
 
     def __init__(self, name):
         self.name = name.lower()
