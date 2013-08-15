@@ -19,6 +19,32 @@ role_ability_table = db.Table('role_ability',
                               )
 
 
+class Role(db.Model):
+    __tablename__ = 'role'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True)
+    abilities = db.relationship(
+        'Ability', secondary=role_ability_table, backref='roles')
+
+    def __init__(self, name):
+        self.name = name.lower()
+
+    def __repr__(self):
+        return '<Role {}>'.format(self.name)
+
+
+class Ability(db.Model):
+    __tablename__ = 'ability'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True)
+
+    def __init__(self, name):
+        self.name = name.lower()
+
+    def __repr__(self):
+        return '<Ability {}>'.format(self.name)
+
+
 class User(db.Model):
     __tablename__ = 'user'
     uid = db.Column(db.Integer, primary_key=True)
