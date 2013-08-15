@@ -1,5 +1,6 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug import generate_password_hash, check_password_hash
+from functools import wraps
 
 db = SQLAlchemy()
 
@@ -77,28 +78,12 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.email)
 
-
-class Role(db.Model):
-    __tablename__ = 'role'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True)
-    abilities = db.relationship(
-        'Ability', secondary=role_ability_table, backref='roles')
-
-    def __init__(self, name):
-        self.name = name.lower()
-
-    def __repr__(self):
-        return '<Role {}>'.format(self.name)
-
-
-class Ability(db.Model):
-    __tablename__ = 'ability'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True)
-
-    def __init__(self, name):
-        self.name = name.lower()
-
-    def __repr__(self):
-        return '<Ability {}>'.format(self.name)
+    # Permissions decorator
+    def user_has(self, attribute):
+        def wrapper(func):
+            @wraps(func)
+            def inner(self, *args, **kwargs):
+                if attribute in self.roles.all() or attribute in self.roles.abilities.all():
+                    return func(*args, **kwargs)
+                else:
+                    return "You do not have access"
