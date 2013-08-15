@@ -12,5 +12,7 @@ login_manager.init_app(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
+with app.test_request_context():
+    db.create_all()
 
 from app import views, auth
