@@ -3,6 +3,12 @@
     <div>
         <h2>Profile</h2>
         <h3>User {{ current_user.email }} is logged in.</h3>
+        <h3>Roles</h3>
+        <ul>
+            {% for role in current_user.roles %}
+                <li>{{ role.name }}</li>
+            {% endfor %}
+        </ul>
         <a href="{{ url_for('index') }}">Home</a>
     </div>
 {% endblock %}
