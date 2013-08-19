@@ -33,6 +33,9 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role {}>'.format(self.name)
 
+    def __str__(self):
+        return self.name
+
 
 class Ability(db.Model):
     __tablename__ = 'ability'
@@ -44,6 +47,9 @@ class Ability(db.Model):
 
     def __repr__(self):
         return '<Ability {}>'.format(self.name)
+
+    def __str__(self):
+        return self.name
 
 
 class User(db.Model):
@@ -102,12 +108,5 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.email)
 
-    # Permissions decorator
-    def user_has(self, attribute):
-        def wrapper(func):
-            @wraps(func)
-            def inner(self, *args, **kwargs):
-                if attribute in self.roles.all() or attribute in self.roles.abilities.all():
-                    return func(*args, **kwargs)
-                else:
-                    return "You do not have access"
+    def __str__(self):
+        return self.email
