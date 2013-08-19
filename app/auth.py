@@ -3,6 +3,28 @@ from flask.ext.login import login_user, logout_user, current_user
 from app import login_manager, app
 from forms import LoginForm, SignupForm
 from models import User, db
+from functools import wraps
+
+# Permissions decorator
+
+
+def user_has(attribute):
+    """
+    Takes an attribute (a string name of either a role or an ability) and returns the function if the user has that attribute
+    """
+    def wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            attribute = Role.query.filter_by(name=attribute) or \
+                Ability.query.filter_by(name=attribute)
+
+            if attribute in current_user.roles or attribute in current_user.roles.abilities.all():
+                return func(*args, **kwargs)
+            else:
+                # Make this do someting way better.
+                return "You do not have access"
+        return inner
+    return wrapper
 
 
 @login_manager.user_loader
