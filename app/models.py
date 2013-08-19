@@ -1,6 +1,6 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug import generate_password_hash, check_password_hash
-from functools import wraps
+from utils import is_sequence
 
 db = SQLAlchemy()
 
@@ -55,16 +55,30 @@ class User(db.Model):
 
     def __init__(self, email, password, roles=None):
         self.email = email.lower()
-        if roles:
+
+        # If only a string is passed for roles, convert it to a list containing
+        # that string
+        if roles and isinstance(roles, basestring):
+            roles = [roles]
+
+        # If a sequence is passed for roles (or if roles has been converted to
+        # a sequence), fetch the corresponding database objects and make a list
+        # of those.
+        if roles and is_sequence(roles):
             role_list = []
             for role in roles:
                 role_list.appen(Role.query.filter_by(name=role).first())
             self.roles = role_list
+        # Otherwise, assign the default 'user' role. Create that role if it
+        # doesn't exist.
         else:
-            r = Role('user')
-            db.session.add(r)
-            db.session.commit()
+            r = Role.query.filter_by(name='user').first()
+            if not r:
+                r = Role('user')
+                db.session.add(r)
+                db.session.commit()
             self.roles = [r]
+
         self.set_password(password)
 
     def set_password(self, password):
