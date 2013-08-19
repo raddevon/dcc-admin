@@ -1,7 +1,6 @@
 from flask.ext.wtf import Form
-from wtforms import TextField, TextAreaField, BooleanField, PasswordField, \
-    SubmitField, validators, ValidationError
-from models import User
+from wtforms import TextField, TextAreaField, BooleanField, PasswordField, SelectMultipleField, HiddenField, SubmitField, validators, ValidationError
+from models import User, Role
 
 
 class SignupForm(Form):
@@ -47,3 +46,29 @@ class LoginForm(Form):
         else:
             self.email.errors.append('Invalid email or password')
             return False
+
+
+class RoleForm(Form):
+    uid = HiddenField()
+    roles = SelectMultipleField('Roles', coerce=int)
+    submit = SubmitField('Change')
+
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        role_list = []
+        for role in Role.query.order_by(Role.id).all():
+            role_list.append((role.id, role.name))
+        self.roles.choices = role_list
+
+    def validate(self):
+        super(RuleForm, self).validate()
+
+        if not User.query.get(self.uid.data):
+            return False
+
+        for role in self.roles.data:
+            print self.roles.data
+            if not Role.query.get(role):
+                return False
+
+        return True
