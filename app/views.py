@@ -19,7 +19,7 @@ def profile():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-# @user_has(['admin'])
+@user_has(['admin'])
 def admin():
     users = models.User.query.all()
     forms = {user.uid: RoleForm(uid=user.uid, roles=[role.id for role in user.roles])
