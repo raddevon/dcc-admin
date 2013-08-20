@@ -2,7 +2,7 @@ from flask import g, redirect, url_for, flash, render_template, request
 from flask.ext.login import login_user, logout_user, current_user
 from app import login_manager, app
 from forms import LoginForm, SignupForm
-from models import User, db
+from models import User, Role, Ability, db
 from functools import wraps
 
 # Permissions decorator
@@ -15,10 +15,10 @@ def user_has(attribute):
     def wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
-            attribute = Role.query.filter_by(name=attribute) or \
-                Ability.query.filter_by(name=attribute)
+            attribute_object = Role.query.filter_by(name=attribute).first() or \
+                Ability.query.filter_by(name=attribute).first()
 
-            if attribute in current_user.roles or attribute in current_user.roles.abilities.all():
+            if attribute_object in current_user.roles or attribute in current_user.roles.abilities.all():
                 return func(*args, **kwargs)
             else:
                 # Make this do someting way better.
