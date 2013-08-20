@@ -30,8 +30,8 @@ def admin():
 
         if current_form.validate():
             u = models.User.query.get(current_form.uid.data)
-            u.roles = [models.Role.query.get(x)
-                       for x in current_form.roles.data]
+            u.roles = [models.Role.query.get(role)
+                       for role in current_form.roles.data]
             db.session.commit()
             flash('Roles updated for {}'.format(u))
 
