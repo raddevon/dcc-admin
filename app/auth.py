@@ -17,7 +17,10 @@ def user_has(attribute):
         def inner(*args, **kwargs):
             attribute_object = Role.query.filter_by(name=attribute).first() or \
                 Ability.query.filter_by(name=attribute).first()
-            if attribute_object in current_user.roles or attribute_object in current_user.roles.abilities.all():
+            user_abilities = []
+            for role in current_user.roles:
+                user_abilities += [role.ability for ability in role.abilities]
+            if attribute_object in current_user.roles or attribute_object in user_abilities:
                 return func(*args, **kwargs)
             else:
                 # Make this do someting way better.
