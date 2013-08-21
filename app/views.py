@@ -19,14 +19,17 @@ def profile():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-@user_has(['admin'])
+# @user_has('admin')
 def admin():
     users = models.User.query.all()
-    forms = {user.uid: RoleForm(uid=user.uid, roles=[role.id for role in user.roles])
+    forms = {user.uid: RoleForm(formdata=None, uid=user.uid, roles=[role.id for role in user.roles])
              for user in users}
 
     if request.method == "POST":
-        current_form = forms[int(request.form['uid'])]
+        current_id = int(request.form['uid'])
+        forms[current_id] = RoleForm(
+            uid=current_id, roles=[role.id for role in users[current_id - 1].roles])
+        current_form = forms[current_id]
 
         if current_form.validate():
             u = models.User.query.get(current_form.uid.data)
