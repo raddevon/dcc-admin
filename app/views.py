@@ -37,5 +37,6 @@ def admin():
                        for role in current_form.roles.data]
             db.session.commit()
             flash('Roles updated for {}'.format(u))
+            return redirect(url_for('admin'))
 
     return render_template('admin.html', users=users, forms=forms)
