@@ -36,7 +36,7 @@ class LoginForm(Form):
         Form.__init__(self, *args, **kwargs)
 
     def validate(self):
-        super(LoginForm, self).validate(self)
+        super(LoginForm, self).validate()
 
         user = User.query.filter_by(email=self.email.data.lower()).first()
         if user and user.check_password(self.password.data):
