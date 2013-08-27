@@ -5,8 +5,6 @@ from forms import LoginForm, SignupForm
 from models import User, Role, Ability, db
 from functools import wraps
 
-# Permissions decorator
-
 
 def user_has(attribute):
     """
