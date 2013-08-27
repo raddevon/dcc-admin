@@ -45,14 +45,16 @@ def signup():
         login_user(newuser)
         return redirect(url_for('profile'))
 
+    # Form does not validate
     return render_template('signup.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # If a user is already logged in
-    # if not current_user.is_authenticated():
-    #     return redirect(url_for('index'))
+    if current_user.is_authenticated():
+        flash('You are already logged in. To sign in as another user, first logout.')
+        return redirect(url_for('index'))
 
     form = LoginForm()
     if request.method == 'POST' and form.validate():
