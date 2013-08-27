@@ -73,7 +73,7 @@ class User(db.Model):
         if roles and is_sequence(roles):
             role_list = []
             for role in roles:
-                role_list.appen(Role.query.filter_by(name=role).first())
+                role_list.append(Role.query.filter_by(name=role).first())
             self.roles = role_list
         # Otherwise, assign the default 'user' role. Create that role if it
         # doesn't exist.
