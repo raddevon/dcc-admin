@@ -14,7 +14,8 @@ class SignupForm(Form):
         Form.__init__(self, *args, **kwargs)
 
     def validate(self):
-        super(SignupForm, self).validate()
+        if not super(SignupForm, self).validate():
+            return False
 
         user = User.query.filter_by(email=self.email.data.lower()).first()
         if user:
@@ -36,7 +37,8 @@ class LoginForm(Form):
         Form.__init__(self, *args, **kwargs)
 
     def validate(self):
-        super(LoginForm, self).validate()
+        if not super(LoginForm, self).validate():
+            return False
 
         user = User.query.filter_by(email=self.email.data.lower()).first()
         if user and user.check_password(self.password.data):
@@ -59,7 +61,8 @@ class RoleForm(Form):
         self.roles.choices = role_list
 
     def validate(self):
-        super(RoleForm, self).validate()
+        if not super(RoleForm, self).validate():
+            return False
 
         if not User.query.get(self.uid.data):
             return False
