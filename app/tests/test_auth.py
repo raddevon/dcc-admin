@@ -46,14 +46,6 @@ class TestAuth(TestCase):
         db.drop_all()
         self.browser.quit()
 
-    def test_server_up(self):
-        try:
-            response = requests.request('GET', 'http://localhost:5000/')
-        except requests.exceptions.ConnectionError:
-            # Try to change assert message shown to tester
-            self.assertTrue(False)
-        self.assertEqual(response.status_code, 200)
-
     def test_user_signup(self):
         self.browser.get('http://localhost:5000/signup')
 
