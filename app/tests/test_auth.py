@@ -70,7 +70,7 @@ class TestDatabase(TestCase):
         user = User('email@domain.com', '12345678')
         db.session.add(user)
         db.session.commit()
-        self.assertEqual(user.uid, 1)
+        self.assertEqual(user.id, 1)
 
     def test_user_gets_default_role(self):
         user = User('email@domain.com', '12345678')
