@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, request, session, url_for
 from flask.ext.login import current_user
 from app import app, db, models
-from auth import user_has
+from app import perms
 from forms import RoleForm
 
 
@@ -19,7 +19,7 @@ def profile():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-@user_has('admin')
+@perms.user_is('admin')
 def admin():
     users = models.User.query.all()
     forms = {user.uid: RoleForm(formdata=None, uid=user.uid, roles=[role.id for role in user.roles])
