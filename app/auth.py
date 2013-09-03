@@ -3,7 +3,6 @@ from flask.ext.login import login_user, logout_user, current_user
 from app import login_manager, app
 from forms import LoginForm, SignupForm
 from models import User, Role, Ability, db
-from functools import wraps
 
 
 @login_manager.user_loader
