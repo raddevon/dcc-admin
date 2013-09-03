@@ -22,17 +22,17 @@ def profile():
 @perms.user_is('admin')
 def admin():
     users = models.User.query.all()
-    forms = {user.uid: RoleForm(formdata=None, uid=user.uid, roles=[role.id for role in user.roles])
+    forms = {user.id: RoleForm(formdata=None, id=user.id, roles=[role.id for role in user.roles])
              for user in users}
 
     if request.method == "POST":
-        current_id = int(request.form['uid'])
+        current_id = int(request.form['id'])
         forms[current_id] = RoleForm(
-            uid=current_id, roles=[role.id for role in users[current_id - 1].roles])
+            id=current_id, roles=[role.id for role in users[current_id - 1].roles])
         current_form = forms[current_id]
 
         if current_form.validate():
-            u = models.User.query.get(current_form.uid.data)
+            u = models.User.query.get(current_form.id.data)
             u.roles = [models.Role.query.get(role)
                        for role in current_form.roles.data]
             db.session.commit()

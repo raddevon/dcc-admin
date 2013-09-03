@@ -49,7 +49,7 @@ class LoginForm(Form):
 
 
 class RoleForm(Form):
-    uid = HiddenField()
+    id = HiddenField()
     roles = SelectMultipleField('Roles', coerce=int)
     submit = SubmitField('Change')
 
@@ -64,7 +64,7 @@ class RoleForm(Form):
         if not super(RoleForm, self).validate():
             return False
 
-        if not User.query.get(self.uid.data):
+        if not User.query.get(self.id.data):
             return False
 
         for role in self.roles.data:

@@ -12,7 +12,7 @@
                     <td>{{ user.email }}</td>
                     <td>
                         <form action="{{ url_for('admin') }}" method="post" accept-charset="utf-8">
-                            {% set form = forms[user.uid] %}
+                            {% set form = forms[user.id] %}
                             {{ form.hidden_tag() }}
 
                             {{ form.roles.label }}
