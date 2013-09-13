@@ -19,6 +19,7 @@ class User(UserMixin):
     def __init__(self, email, password, roles=None):
         self.email = email.lower()
         self.set_password(password)
+        UserMixin.__init__(self, roles)
 
     def set_password(self, password):
         self.pwdhash = generate_password_hash(password)
