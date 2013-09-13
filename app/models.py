@@ -26,3 +26,6 @@ class User(UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.pwdhash, password)
+
+    def __str__(self):
+        return self.email
