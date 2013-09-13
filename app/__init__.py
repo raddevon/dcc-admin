@@ -2,7 +2,7 @@ from flask import Flask
 from flask.ext.login import LoginManager, current_user
 from config import DATABASE_URI
 from flask.ext.sqlalchemy import SQLAlchemy
-from app.flask_permissions import Permissions
+from flask.ext.permissions.core import Permissions
 
 db = SQLAlchemy()
 

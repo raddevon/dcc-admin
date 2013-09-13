@@ -1,6 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import TextField, TextAreaField, BooleanField, PasswordField, SelectMultipleField, HiddenField, SubmitField, validators, ValidationError
-from models import User, Role
+from models import User
+from flask.ext.permissions.models import Role
 
 
 class SignupForm(Form):

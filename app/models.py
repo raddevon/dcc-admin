@@ -1,15 +1,7 @@
 from werkzeug import generate_password_hash, check_password_hash
 from utils import is_sequence
 from app import db
-from app.flask_permissions.models import RoleMixin, AbilityMixin, UserMixin
-
-
-class Role(RoleMixin):
-    pass
-
-
-class Ability(AbilityMixin):
-    pass
+from flask.ext.permissions.models import UserMixin
 
 
 class User(UserMixin):

@@ -2,7 +2,8 @@ from flask import g, redirect, url_for, flash, render_template, request
 from flask.ext.login import login_user, logout_user, current_user
 from app import login_manager, app
 from forms import LoginForm, SignupForm
-from models import User, Role, Ability, db
+from models import User, db
+from flask.ext.permissions.models import Role, Ability
 
 
 @login_manager.user_loader
