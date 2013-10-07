@@ -4,6 +4,7 @@ from app import app, db, models
 from app import perms
 from forms import RoleForm
 from flask.ext.permissions.models import Role
+from flask.ext.permissions.decorators import user_is
 
 
 @app.route('/')
@@ -20,7 +21,7 @@ def profile():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-@perms.user_is('admin')
+@user_is('admin')
 def admin():
     users = models.User.query.all()
     forms = {user.id: RoleForm(formdata=None, id=user.id, roles=[role.id for role in user.roles])
