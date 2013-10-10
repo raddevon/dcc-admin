@@ -11,6 +11,12 @@ def load_user(userid):
     return User.query.get(userid)
 
 
+@app.context_processor
+def inject_login_form():
+    form = LoginForm()
+    return dict(login_form=form)
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
