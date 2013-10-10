@@ -1,0 +1,11 @@
+{
+  "name": "DCC-Admin-Panel",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-contrib-compass": "~0.2.0",
+    "grunt-contrib-imagemin": "~0.3.0",
+    "load-grunt-tasks": "~0.1.0"
+  }
+}
