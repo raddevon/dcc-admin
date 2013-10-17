@@ -1,0 +1,41 @@
+<mockup version="1.0" skin="wireframe" fontFace="Balsamiq Sans" measuredW="809" measuredH="377" mockupW="787" mockupH="355">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::BrowserWindow" x="22" y="22" w="787" h="355" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>dcc-admin%20node%20management%0Ahttp%3A//127.0.0.1/nodes/</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Title" x="37" y="108" w="-1" h="-1" measuredW="342" measuredH="43" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Node%20Management</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::LinkBar" x="685" y="108" w="-1" h="-1" measuredW="109" measuredH="19" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>raddevon%2C%20logout</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::DataGrid" x="37" y="166" w="757" h="173" measuredW="365" measuredH="168" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>ID%20%5E%2C%20Name%20%5Ev%2C%20Description%2C%20State%20%5Ev%0A001%2C%20entrance-door%2C%20Entrance%20door%20open%2C%20%0A002%2C%20entrance-lock%2C%20Entrance%20door%20lock%2C%20%0A003%2C%20north-spl%2C%20North%20sound%20pressure%20level%2C%20%0A004%2C%20south-spl%2C%20South%20sound%20pressure%20level%2C%20%0A005%2C%20temp%2C%20Space%20temperature%2C%20</text>
+      </controlProperties>
+    </control>
+    <control controlID="18" controlTypeID="__group__" x="702" y="184" w="68" h="148" measuredW="68" measuredH="148" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Switch" x="0" y="0" w="-1" h="-1" measuredW="68" measuredH="28" zOrder="0" locked="false" isInGroup="18">
+          <controlProperties>
+            <onOffState>off</onOffState>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Switch" x="0" y="30" w="-1" h="-1" measuredW="68" measuredH="28" zOrder="1" locked="false" isInGroup="18"/>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Switch" x="0" y="60" w="-1" h="-1" measuredW="68" measuredH="28" zOrder="2" locked="false" isInGroup="18"/>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Switch" x="0" y="90" w="-1" h="-1" measuredW="68" measuredH="28" zOrder="3" locked="false" isInGroup="18">
+          <controlProperties>
+            <onOffState>off</onOffState>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Switch" x="0" y="120" w="-1" h="-1" measuredW="68" measuredH="28" zOrder="4" locked="false" isInGroup="18"/>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>
