@@ -4,7 +4,7 @@ from app import app, db, models
 from app import perms
 from forms import RoleForm
 from flask.ext.permissions.models import Role
-from flask.ext.permissions.decorators import user_is
+from flask.ext.permissions.decorators import user_is, user_has
 
 
 @app.route('/')
