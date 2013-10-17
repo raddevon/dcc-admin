@@ -19,7 +19,7 @@ def profile():
     return redirect(url_for('login'))
 
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST'])
 @user_is('admin')
 def admin():
     users = models.User.query.all()
