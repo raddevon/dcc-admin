@@ -49,21 +49,30 @@ class NodeList(Resource):
 class User(Resource):
 
     def get(self, user_id):
-        args = parser.parse_args()
-        user = UserModel.get(args['user_id'])
-        try:
-            return ({'email': user.email, 'roles': user.roles})
-        except AttributeError():
-            return abort(404, message="User {} not found.".format(user_id))
+        user = fetch_record(User, user_id)
+        return ({'email': user.email, 'roles': user.roles})
 
     def put(self, user_id):
-        pass
+        payload = user_parser.parse_args()
+        user = User(payload['email'], payload['password'])
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
 
     def post(self, user_id):
-        pass
+        user = fetch_record(User, user_id)
+        payload = user_parser.parse_args()
+        for attribute, value in payload.iteritems():
+            user.attribute = payload[attribute]
+        db.session.add(user)
+        db.session.commit()
+        return user, 200
 
     def delete(self, user_id):
-        pass
+        user = fetch_record(User, user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return '', 204
 
 
 class UserList(Resource):
