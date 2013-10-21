@@ -54,13 +54,7 @@ class User(Resource):
         user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
 
-    def put(self, user_id):
-        payload = user_parser.parse_args()
-        user = User(payload['email'], payload['password'])
-        db.session.add(user)
-        db.session.commit()
-        return user, 201
-
+    @user_is('admin')
     def post(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
@@ -87,6 +81,14 @@ class UserList(Resource):
         for user in users:
             users_dict[user.id] = {'email': user.email, 'roles': user.roles}
         return users_dict
+
+    @user_is('admin')
+    def put(self):
+        payload = user_parser.parse_args()
+        user = models.User(payload['email'], payload['password'])
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
 
 api.add_resource(User, '/api/user/<string:user_id>')
 api.add_resource(UserList, '/api/users/')
