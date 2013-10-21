@@ -1,7 +1,8 @@
 from app import app, db
 from flask.ext.restful import reqparse, Resource, abort
 from flask.ext.permissions.models import Role, Ability
-from app.models import User as UserModel
+from flask.ext.permissions.decorators import user_is
+import app.models as models
 
 api = restful.Api(app)
 
@@ -49,7 +50,7 @@ class NodeList(Resource):
 class User(Resource):
 
     def get(self, user_id):
-        user = fetch_record(User, user_id)
+        user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
 
     def put(self, user_id):
@@ -60,7 +61,7 @@ class User(Resource):
         return user, 201
 
     def post(self, user_id):
-        user = fetch_record(User, user_id)
+        user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
             user.attribute = payload[attribute]
@@ -69,7 +70,7 @@ class User(Resource):
         return user, 200
 
     def delete(self, user_id):
-        user = fetch_record(User, user_id)
+        user = fetch_record(models.User, user_id)
         db.session.delete(user)
         db.session.commit()
         return '', 204
@@ -78,7 +79,7 @@ class User(Resource):
 class UserList(Resource):
 
     def get(self):
-        users = UserModel.get.all()
+        users = models.User.get.all()
         users_dict = {}
         for user in users:
             users_dict[user.id] = {'email': user.email, 'roles': user.roles}
