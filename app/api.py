@@ -5,8 +5,24 @@ from app.models import User as UserModel
 
 api = restful.Api(app)
 
-parser = reqparse.RequestParser()
-parser.add_argument('user_id', type=int, "The user id should be an  integer.")
+user_parser = reqparse.RequestParser()
+# Would rather restrict type of this argument to a properly formatted
+# email address
+user_parser.add_argument(
+    'email', type=str, required=True, help="Please provide an email address for the user.")
+user_parser.add_argument(
+    'password', type=str, required=True, help="Please provide a password for the user.")
+# Will type=Role work?
+user_parser.add_argument(
+    'roles', type=Role, help="Optionally provide roles to be assigned to the user")
+
+
+# Will this work? I'm worried about the Model.get(id) part specifically.
+def fetch_record(Model, id):
+    fetched_record = Model.get(id)
+    if not fetched_record:
+        abort(404, message="Requested record does not exist in the database.")
+    return fetched_record
 
 
 class Node(Resource):
