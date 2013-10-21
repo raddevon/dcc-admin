@@ -49,6 +49,7 @@ class NodeList(Resource):
 
 class User(Resource):
 
+    @user_is('admin')
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
@@ -69,6 +70,7 @@ class User(Resource):
         db.session.commit()
         return user, 200
 
+    @user_is('admin')
     def delete(self, user_id):
         user = fetch_record(models.User, user_id)
         db.session.delete(user)
@@ -78,6 +80,7 @@ class User(Resource):
 
 class UserList(Resource):
 
+    @user_is('admin')
     def get(self):
         users = models.User.get.all()
         users_dict = {}
