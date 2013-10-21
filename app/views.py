@@ -1,4 +1,5 @@
 from flask import render_template, flash, redirect, request, session, url_for
+import requests
 from flask.ext.login import current_user
 from app import app, db, models
 from app import perms
