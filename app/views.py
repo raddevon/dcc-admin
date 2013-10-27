@@ -43,19 +43,19 @@ def admin():
     return render_template('admin.html', users=users, forms=forms)
 
 
-@app.route('/nodes', methods=['GET', 'POST'])
-@user_has('manage_nodes')
-def nodes():
-    return render_template('nodes.html')
+# @app.route('/nodes', methods=['GET', 'POST'])
+# @user_has('manage_nodes')
+# def nodes():
+#     return render_template('nodes.html')
 
 
-@app.route('/nodes/.json', methods=['GET', 'POST'])
-@user_has('manage_nodes')
-def get_nodes_ajax():
-    return flask.jsonify(something)
+# @app.route('/nodes/.json', methods=['GET', 'POST'])
+# @user_has('manage_nodes')
+# def get_nodes_ajax():
+#     return flask.jsonify(something)
 
 
-@app.route('/users/.json', methods=['GET', 'POST'])
-@user_has('manage_users')
-def nodes():
-    return flask.jsonify(something)
+# @app.route('/users/.json', methods=['GET', 'POST'])
+# @user_has('manage_users')
+# def nodes():
+#     return flask.jsonify(something)
