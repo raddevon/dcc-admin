@@ -1,10 +1,10 @@
 from app import app, db
-from flask.ext.restful import reqparse, Resource, abort
+from flask.ext.restful import reqparse, Resource, abort, Api
 from flask.ext.permissions.models import Role, Ability
 from flask.ext.permissions.decorators import user_is
 import app.models as models
 
-api = restful.Api(app)
+api = Api(app)
 
 user_parser = reqparse.RequestParser()
 # Would rather restrict type of this argument to a properly formatted
