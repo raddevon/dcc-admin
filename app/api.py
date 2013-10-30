@@ -18,9 +18,8 @@ user_parser.add_argument(
     'roles', type=Role, help="Optionally provide roles to be assigned to the user")
 
 
-# Will this work? I'm worried about the Model.get(id) part specifically.
 def fetch_record(Model, id):
-    fetched_record = Model.get(id)
+    fetched_record = Model.query.get(id)
     if not fetched_record:
         abort(404, message="Requested record does not exist in the database.")
     return fetched_record
@@ -76,7 +75,7 @@ class UserList(Resource):
 
     @user_is('admin')
     def get(self):
-        users = models.User.get.all()
+        users = models.User.query.all()
         users_dict = {}
         for user in users:
             users_dict[user.id] = {'email': user.email, 'roles': user.roles}
