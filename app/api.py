@@ -78,8 +78,9 @@ class UserList(Resource):
         users = models.User.query.all()
         users_dict = {}
         for user in users:
-            users_dict[user.id] = {'email': user.email, 'roles': user.roles}
-        return users_dict
+            users_dict[user.id] = {
+                'email': user.email, 'roles': [{'name': role.name, 'id': role.id} for role in user.roles]}
+        return users_dict, 200
 
     @user_is('admin')
     def put(self):
