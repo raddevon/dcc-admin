@@ -1,7 +1,7 @@
 from app import app, db
 from flask.ext.restful import reqparse, Resource, abort, Api
 from flask.ext.permissions.models import Role, Ability
-from models import User
+import models
 from flask.ext.httpauth import HTTPBasicAuth
 from flask.ext.permissions.decorators import user_is
 from werkzeug import generate_password_hash
@@ -12,7 +12,11 @@ auth = HTTPBasicAuth()
 
 
 def get_user_record(email):
-    return User.query.filter_by(email=email).first()
+    return models.User.query.filter_by(email=email).first()
+
+
+def get_httpauth_user_record():
+    return get_user_record(auth.username())
 
 
 @auth.get_password
@@ -69,13 +73,13 @@ class NodeList(Resource):
 class User(Resource):
 
     @auth.login_required
-    @user_is('admin', get_user_record(auth.username()))
+    @user_is('admin', get_httpauth_user_record)
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
 
     @auth.login_required
-    @user_is('admin', get_user_record(auth.username()))
+    @user_is('admin', get_httpauth_user_record)
     def post(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
@@ -86,7 +90,7 @@ class User(Resource):
         return user, 200
 
     @auth.login_required
-    @user_is('admin', get_user_record(auth.username()))
+    @user_is('admin', get_httpauth_user_record)
     def delete(self, user_id):
         user = fetch_record(models.User, user_id)
         db.session.delete(user)
@@ -97,7 +101,7 @@ class User(Resource):
 class UserList(Resource):
 
     @auth.login_required
-    @user_is('admin', get_user_record(auth.username()))
+    @user_is('admin', get_httpauth_user_record)
     def get(self):
         users = models.User.query.all()
         users_dict = {}
@@ -107,7 +111,7 @@ class UserList(Resource):
         return users_dict, 200
 
     @auth.login_required
-    @user_is('admin', get_user_record(auth.username()))
+    @user_is('admin', get_httpauth_user_record)
     def put(self):
         payload = user_parser.parse_args()
         user = models.User(payload['email'], payload['password'])
