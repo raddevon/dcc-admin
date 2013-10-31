@@ -1,10 +1,30 @@
 from app import app, db
 from flask.ext.restful import reqparse, Resource, abort, Api
 from flask.ext.permissions.models import Role, Ability
+from models import User
+from flask.ext.httpauth import HTTPBasicAuth
 from flask.ext.permissions.decorators import user_is
+from werkzeug import generate_password_hash
 import app.models as models
 
 api = Api(app)
+auth = HTTPBasicAuth()
+
+
+def get_user_record(email):
+    return User.query.filter_by(email=email).first()
+
+
+@auth.get_password
+def get_password(username):
+    user = get_user_record(username)
+    return user.pwdhash
+
+
+@auth.hash_password
+def hash_pw(password):
+    return generate_password_hash(password)
+
 
 user_parser = reqparse.RequestParser()
 # Would rather restrict type of this argument to a properly formatted
@@ -48,12 +68,14 @@ class NodeList(Resource):
 
 class User(Resource):
 
-    @user_is('admin')
+    @auth.login_required
+    @user_is('admin', get_user_record(auth.username()))
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
 
-    @user_is('admin')
+    @auth.login_required
+    @user_is('admin', get_user_record(auth.username()))
     def post(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
@@ -63,7 +85,8 @@ class User(Resource):
         db.session.commit()
         return user, 200
 
-    @user_is('admin')
+    @auth.login_required
+    @user_is('admin', get_user_record(auth.username()))
     def delete(self, user_id):
         user = fetch_record(models.User, user_id)
         db.session.delete(user)
@@ -73,7 +96,8 @@ class User(Resource):
 
 class UserList(Resource):
 
-    @user_is('admin')
+    @auth.login_required
+    @user_is('admin', get_user_record(auth.username()))
     def get(self):
         users = models.User.query.all()
         users_dict = {}
@@ -82,7 +106,8 @@ class UserList(Resource):
                 'email': user.email, 'roles': [{'name': role.name, 'id': role.id} for role in user.roles]}
         return users_dict, 200
 
-    @user_is('admin')
+    @auth.login_required
+    @user_is('admin', get_user_record(auth.username()))
     def put(self):
         payload = user_parser.parse_args()
         user = models.User(payload['email'], payload['password'])
