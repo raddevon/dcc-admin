@@ -4,11 +4,19 @@ from flask.ext.permissions.models import Role, Ability
 import models
 from flask.ext.httpauth import HTTPBasicAuth
 from flask.ext.permissions.decorators import user_is
-from werkzeug import generate_password_hash
+from werkzeug import generate_password_hash, check_password_hash
 import app.models as models
 
 api = Api(app)
-auth = HTTPBasicAuth()
+
+
+class HTTPWerkzeugBasicAuth(HTTPBasicAuth):
+
+    def authenticate(self, auth, password):
+        client_password = auth.password
+        return check_password_hash(password, client_password)
+
+auth = HTTPWerkzeugBasicAuth()
 
 
 def get_user_record(email):
