@@ -21,4 +21,4 @@ db.init_app(app)
 with app.test_request_context():
     db.create_all()
 
-from app import views, auth
+from app import views, auth, api

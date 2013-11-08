@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect, request, session, url_for
 from flask.ext.login import current_user
 from app import app, db, models
 from app import perms
+import json
 from forms import RoleForm
 from flask.ext.permissions.models import Role
 from flask.ext.permissions.decorators import user_is, user_has
@@ -22,14 +23,16 @@ def profile():
 @app.route('/users', methods=['GET', 'POST'])
 @user_is('admin')
 def admin():
-    users = models.User.query.all()
-    forms = {user.id: RoleForm(formdata=None, id=user.id, roles=[role.id for role in user.roles])
-             for user in users}
+    with app.test_client() as api:
+        users = json.loads(api.get('api/users/').data)
+    forms = {uid: RoleForm(formdata=None, id=uid, roles=[role['id'] for role in user['roles']])
+             for uid, user in users.iteritems()}
+    print forms['3'].hidden_tag()
 
     if request.method == "POST":
         current_id = int(request.form['id'])
         forms[current_id] = RoleForm(
-            id=current_id, roles=[(role.id for role in user.roles) for user in users if user.id == current_id])
+            id=current_id, roles=[(role['id'] for role in user.roles) for user in users if uid == current_id])
         current_form = forms[current_id]
 
         if current_form.validate():
@@ -43,19 +46,7 @@ def admin():
     return render_template('admin.html', users=users, forms=forms)
 
 
-# @app.route('/nodes', methods=['GET', 'POST'])
-# @user_has('manage_nodes')
-# def nodes():
-#     return render_template('nodes.html')
-
-
-# @app.route('/nodes/.json', methods=['GET', 'POST'])
-# @user_has('manage_nodes')
-# def get_nodes_ajax():
-#     return flask.jsonify(something)
-
-
-# @app.route('/users/.json', methods=['GET', 'POST'])
-# @user_has('manage_users')
-# def nodes():
-#     return flask.jsonify(something)
+@app.route('/nodes', methods=['GET', 'POST'])
+@user_has('manage_nodes')
+def nodes():
+    return render_template('nodes.html')
