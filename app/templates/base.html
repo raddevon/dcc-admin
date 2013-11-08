@@ -18,7 +18,7 @@
       <section class="top-bar-section">
         <ul class="right">
           <li><a href="#">Nodes</a></li>
-          <li><a href="{{ url_for('admin')}}">Users</a></li>
+          <li><a href="{{ url_for('admin')}}" id='user-management-link'>Users</a></li>
           {% if current_user.is_authenticated() %}
             <li class="has-dropdown">
               <a href="#">{{ current_user.email }}</a>
@@ -67,7 +67,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 columns" id="main-content">
     {% block content %}{% endblock %}
     </div>
   </div>
@@ -93,6 +93,40 @@
     <script src="{{ url_for('static', filename='javascripts/foundation/foundation.interchange.js') }}"></script>
     <script>
       $(document).foundation();
+    </script>
+    <script src="{{ url_for('static', filename='javascripts/vendor/handlebars-v1.1.2.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascripts/admin.js') }}"></script>
+    <script id="user-management-template" type="text/x-handlebars-template">
+      <div>
+          <h2>User Management</h2>
+          {% raw %}
+          {{#if users}}
+          <form>
+            <table>
+              <tr>
+                <th>User</th>
+                <th>Roles</th>
+              </tr>
+          {{/if}}
+              {{#each users}}
+                <tr>
+                  <td>{{email}}</td>
+                  <td>
+                    <label for="user{{@key}}-roles">Roles</label>
+                    <select multiple id="user{{@key}}-roles" name="user{{@key}}-roles">
+                    // Each select widget needs to include all the possible roles.
+                    {{#each roles}}
+                    {{/roles}}
+                    </select>
+                  </td>
+                </tr>
+              {{/each}}
+          {{#if users}}
+            </table>
+          </form>
+          {{/if}}
+          {% endraw %}
+      </div>
     </script>
 </body>
 </html>
