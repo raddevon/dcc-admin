@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" ng-app>
+<head>
+    <meta charset="UTF-8">
+    <title>Delicious Admin</title>
+    <link rel="stylesheet" href="/static/stylesheets/app.css">
+    <script src="/static/javascripts/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+  <div class="fixed">
+    <nav class="top-bar" data-options="is_hover:false">
+      <ul class="title-area">
+        <li class="name">
+          <h1><a href="{{ url_for('index') }}">Delicious Candy Admin</a></h1>
+        </li>
+        <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+      </ul>
+      <section class="top-bar-section">
+        <ul class="right">
+          <li><a href="#">Nodes</a></li>
+          <li><a href="{{ url_for('admin')}}" id='user-management-link'>Users</a></li>
+          {% if current_user.is_authenticated() %}
+            <li class="has-dropdown">
+              <a href="#">{{ current_user.email }}</a>
+              <ul class="dropdown">
+                <li><a href="{{ url_for('profile')}}">Profile</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="has-dropdown">
+              <a href="#">Login</a>
+              <!-- Dropdown menu closes when focusing on a form field. -->
+              <ul class="dropdown">
+                <li class="has-form">
+                  <form action="{{ url_for('login') }}" method="post" accept-charset="utf-8">
+                    {{ login_form.hidden_tag() }}
+
+                    {{ login_form.email.label }}
+                    {{ login_form.email }}
+
+                    {{ login_form.password.label }}
+                    {{ login_form.password }}
+
+                    {{ login_form.submit }}
+                  </form>
+                </li>
+              </ul>
+            </li>
+          {% endif %}
+        </ul>
+      </section>
+    </nav>
+  </div>
+  <div class="row">
+    <div class="small-12 columns">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=alert-box data-alert>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            <a href="#" class="close">&times;</a>
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+  <div class="row">
+    <!-- Angular view -->
+    <div class="small-12 columns" id="main-content" ng-view>
+    </div>
+  </div>
+  <script>
+    document.write('<script src=/static/javascripts/vendor/' +
+    ('__proto__' in {} ? 'zepto' : 'jquery') +
+    '.js><\/script>');
+    </script>
+    <script src="/static/javascripts/foundation/foundation.js"></script>
+    <script src="/static/javascripts/foundation/foundation.alerts.js"></script>
+    <script src="/static/javascripts/foundation/foundation.clearing.js"></script>
+    <script src="/static/javascripts/foundation/foundation.cookie.js"></script>
+    <script src="/static/javascripts/foundation/foundation.dropdown.js"></script>
+    <script src="/static/javascripts/foundation/foundation.forms.js"></script>
+    <script src="/static/javascripts/foundation/foundation.joyride.js"></script>
+    <script src="/static/javascripts/foundation/foundation.magellan.js"></script>
+    <script src="/static/javascripts/foundation/foundation.orbit.js"></script>
+    <script src="/static/javascripts/foundation/foundation.placeholder.js"></script>
+    <script src="/static/javascripts/foundation/foundation.reveal.js"></script>
+    <script src="/static/javascripts/foundation/foundation.section.js"></script>
+    <script src="/static/javascripts/foundation/foundation.tooltips.js"></script>
+    <script src="/static/javascripts/foundation/foundation.topbar.js"></script>
+    <script src="/static/javascripts/foundation/foundation.interchange.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular.min.js"></script>
+    <script src="/static/javascripts/app.js"></script>
+    <script src="/static/javascripts/controller.js"></script>
+    <script src="/static/javascripts/directives.js"></script>
+    <script src="/static/javascripts/filter.js"></script>
+    <script src="/static/javascripts/services.js"></script>
+    <script src="/static/javascripts/vendor/handlebars-v1.1.2.js"></script>
+    <script src="/static/javascripts/admin.js"></script>
+    <script id="user-management-template" type="text/x-handlebars-template">
+      <div>
+          <h2>User Management</h2>
+          {% raw %}
+          {{#if users}}
+          <form>
+            <table>
+              <tr>
+                <th>User</th>
+                <th>Roles</th>
+              </tr>
+          {{/if}}
+              {{#each users}}
+                <tr>
+                  <td>{{email}}</td>
+                  <td>
+                    <label for="user{{@key}}-roles">Roles</label>
+                    <select multiple id="user{{@key}}-roles" name="user{{@key}}-roles">
+
+
+                    </select>
+                  </td>
+                </tr>
+              {{/each}}
+          {{#if users}}
+            </table>
+          </form>
+          {{/if}}
+          {% endraw %}
+      </div>
+    </script>
+</body>
+</html>

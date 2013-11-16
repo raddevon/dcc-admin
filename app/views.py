@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, request, session, url_for
+from flask import render_template, flash, redirect, request, session, url_for, send_file, make_response
 from flask.ext.login import current_user
 from app import app, db, models
 from app import perms
@@ -10,7 +10,9 @@ from flask.ext.permissions.decorators import user_is, user_has
 
 @app.route('/')
 def index():
-    return render_template('home.html')
+    if app.debug:
+        return make_response(open('templates/index.html').read())
+    return send_file('templates/index.html')
 
 
 @app.route('/profile')
