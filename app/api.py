@@ -128,4 +128,4 @@ class UserList(Resource):
         return user, 201
 
 api.add_resource(User, '/api/user/<string:user_id>')
-api.add_resource(UserList, '/api/users/')
+api.add_resource(UserList, '/api/user/')
