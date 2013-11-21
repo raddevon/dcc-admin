@@ -5,5 +5,5 @@ function userManagementController($scope, $http, Users) {
 }
 
 function indexController($scope) {
-
+    $scope.currentUser = 'raddevon@gmail.com';
 }
