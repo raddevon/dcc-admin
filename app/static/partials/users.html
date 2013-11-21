@@ -1,28 +1,20 @@
 <div ng-controller="userManagementController">
     <h2>User Management</h2>
-    <table>
-        <tr>
-            <th>User</th>
-            <th>Roles</th>
-        </tr>
-        {% for user in users %}
+    <form ng-if="users">
+        <table>
             <tr>
-                <td>{{ user.email }}</td>
+                <th>User</th>
+                <th>Roles</th>
+            </tr>
+            <tr ng-repeat="user in users">
+                <td>{{user.email}}</td>
                 <td>
-                    <form action="{{ url_for('admin') }}" method="post" accept-charset="utf-8">
-                        {% set form = forms[user.id] %}
-                        {{ form.hidden_tag() }}
+                    <label for="user{{$index}}-roles">Roles</label>
+                    <select multiple id="user{{$index}}-roles" name="user{{$index}}-roles">
 
-                        {{ form.roles.label }}
-                        {{ form.roles }}
-
-                        {{ form.user }}
-
-                        {{ form.submit }}
-                    </form>
+                    </select>
                 </td>
             </tr>
-        {% endfor %}
-    </table>
-    <a href="{{ url_for('index') }}">Home</a>
+        </table>
+    </form>
 </div>
