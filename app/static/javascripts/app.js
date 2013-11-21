@@ -6,11 +6,14 @@ angular.module('dccAdmin', ['angularFlaskServices'])
                         templateUrl: 'static/partials/index.html',
                         controller: IndexController
                 })
+                .when('/users', {
+                        templateUrl: 'static/partials/users.html',
+                        controller: userManagementController
+                })
                 .otherwise({
                         redirectTo: '/'
                 })
                 ;
 
                 $locationProvider.html5Mode(true);
-        }])
-;
+        }]);
