@@ -1,5 +1,5 @@
-function userManagementController($scope, $http) {
-    var usersQuery = Users.get({}, function(posts) {
+function userManagementController($scope, $http, Users) {
+    var usersQuery = Users.get({}, function(users) {
         $scope.users = users.objects;
     });
 }
