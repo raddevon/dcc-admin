@@ -1,4 +1,4 @@
-angular.module('dccAdmin', ['angularFlaskServices'])
+angular.module('dccAdmin', ['ngRoute', 'dccAdminServices'])
         .config(['$routeProvider', '$locationProvider',
                 function($routeProvider, $locationProvider) {
                 $routeProvider
@@ -12,8 +12,7 @@ angular.module('dccAdmin', ['angularFlaskServices'])
                 })
                 .otherwise({
                         redirectTo: '/'
-                })
-                ;
+                });
 
                 $locationProvider.html5Mode(true);
         }]);
