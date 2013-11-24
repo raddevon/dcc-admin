@@ -3,8 +3,8 @@ angular.module('dccAdmin', ['ngRoute', 'dccAdminServices'])
                 function($routeProvider, $locationProvider) {
                 $routeProvider
                 .when('/', {
-                        templateUrl: 'static/partials/index.html',
-                        controller: IndexController
+                        templateUrl: 'static/partials/home.html',
+                        controller: indexController
                 })
                 .when('/users', {
                         templateUrl: 'static/partials/users.html',
