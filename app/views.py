@@ -11,8 +11,8 @@ from flask.ext.permissions.decorators import user_is, user_has
 @app.route('/')
 def index():
     if app.debug:
-        return make_response(open('app/static/partials/index.html').read())
-    return send_file('app/static/partials/index.html')
+        return make_response(open('app/templates/index.html').read())
+    return send_file('app/templates/index.html')
 
 
 @app.route('/profile')
