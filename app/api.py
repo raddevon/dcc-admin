@@ -125,7 +125,7 @@ class UserList(Resource):
         user = models.User(payload['email'], payload['password'])
         db.session.add(user)
         db.session.commit()
-        return user, 201
+        return user, 201, {'Location': '/api/user/{}'.format(user.id)}
 
 api.add_resource(User, '/api/user/<string:user_id>')
 api.add_resource(UserList, '/api/user/')
