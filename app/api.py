@@ -1,6 +1,6 @@
 from app import app, db
 from flask.ext.restful import reqparse, Resource, abort, Api
-from flask.ext.permissions.models import Role, Ability
+from flask.ext.permissions import models as perms_models
 import models
 from flask.ext.httpauth import HTTPBasicAuth
 from flask.ext.permissions.decorators import user_is
@@ -39,15 +39,17 @@ def hash_pw(password):
 
 
 user_parser = reqparse.RequestParser()
-# Would rather restrict type of this argument to a properly formatted
-# email address
 user_parser.add_argument(
     'email', type=str, required=True, help="Please provide an email address for the user.")
 user_parser.add_argument(
     'password', type=str, required=True, help="Please provide a password for the user.")
-# Will type=Role work?
 user_parser.add_argument(
-    'roles', type=Role, help="Optionally provide roles to be assigned to the user")
+    'roles', type=perms_models.Role, help="Optionally provide roles to be assigned to the user")
+
+
+role_parser = reqparse.RequestParser()
+role_parser.add_argument(
+    'name', type=str, required=True, help="Each role needs a name.")
 
 
 def fetch_record(Model, id):
@@ -127,5 +129,54 @@ class UserList(Resource):
         db.session.commit()
         return user, 201, {'Location': '/api/user/{}'.format(user.id)}
 
+
+class Role(Resource):
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def get(self, role_id):
+        user = fetch_record(perms_models.Role, role_id)
+        return ({'name': role.name, 'id': role.id})
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def post(self, role_id):
+        role = fetch_record(perms_models.Role, role_id)
+        payload = role_parser.parse_args()
+        for attribute, value in payload.iteritems():
+            role.attribute = payload[attribute]
+        db.session.add(role)
+        db.session.commit()
+        return role, 200
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def delete(self, role_id):
+        role = fetch_record(perms_models.Role, role_id)
+        db.session.delete(role)
+        db.session.commit()
+        return '', 204
+
+
+class RoleList(Resource):
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def get(self):
+        roles = perms_models.Role.query.all()
+        roles_dict = {role.id: role.name for role in roles}
+        return roles_dict, 200
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def put(self):
+        payload = role_parser.parse_args()
+        role = perms_models.Role(payload['name'])
+        db.session.add(role)
+        db.session.commit()
+        return role, 201, {'Location': '/api/role/{}'.format(role.id)}
+
 api.add_resource(User, '/api/user/<string:user_id>')
 api.add_resource(UserList, '/api/user/')
+api.add_resource(Role, '/api/role/<string:role_id>')
+api.add_resource(RoleList, '/api/role/')
