@@ -9,9 +9,9 @@
             <tr ng-repeat="user in users">
                 <td>{{user.email}}</td>
                 <td>
-                    <label for="user{{$index}}-roles">Roles</label>
-                    <select multiple id="user{{$index}}-roles" name="user{{$index}}-roles">
-
+                    <label for="user{{user.id}}-roles">Roles</label>
+                    <!-- Problem with comprehension. Can't see the 'roles' object in dev tools in order to play with it. -->
+                    <select multiple id="user{{user.id}}-roles" name="user{{user.id}}-roles" ng-options="role[id] for id in Object.keys(roles)">
                     </select>
                 </td>
             </tr>
