@@ -11,7 +11,7 @@
                 <td>
                     <label for="user{{user.id}}-roles">Roles</label>
                     <!-- Problem with comprehension. Can't see the 'roles' object in dev tools in order to play with it. -->
-                    <select multiple id="user{{user.id}}-roles" name="user{{user.id}}-roles" ng-options="role[id] for id in Object.keys(roles)">
+                    <select multiple id="user{{user.id}}-roles" name="user{{user.id}}-roles" ng-model="selectedRoles" ng-options="value for (key, value) in roles">
                     </select>
                 </td>
             </tr>
