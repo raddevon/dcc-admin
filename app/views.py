@@ -8,8 +8,9 @@ from flask.ext.permissions.models import Role
 from flask.ext.permissions.decorators import user_is, user_has
 
 
+@app.route('/<path:path>')
 @app.route('/')
-def index():
+def index(path=None):
     if app.debug:
         return make_response(open('app/templates/index.html').read())
     return send_file('app/templates/index.html')
