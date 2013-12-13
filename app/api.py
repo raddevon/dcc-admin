@@ -44,7 +44,7 @@ user_parser.add_argument(
 user_parser.add_argument(
     'password', type=str, required=True, help="Please provide a password for the user.")
 user_parser.add_argument(
-    'roles', type=perms_models.Role, help="Optionally provide roles to be assigned to the user")
+    'role', type=int, action='append', help="Optionally provide roles to be assigned to the user")
 
 
 role_parser = reqparse.RequestParser()
@@ -88,13 +88,19 @@ class User(Resource):
         user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
 
+    # Getting "You do not have access" when testing this resource with cURL
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def post(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
-            user.attribute = payload[attribute]
+            if attribute == 'role':
+                user.roles = [fetch_record(perms_models.Roles, role)
+                              for role in payload['role']]
+            else:
+                user.attribute = payload[attribute]
+        print user.roles
         db.session.add(user)
         db.session.commit()
         return user, 200
