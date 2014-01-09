@@ -3,7 +3,7 @@ import json
 from base64 import b64encode
 
 import app.models as models
-from flask.ext.permissions.models import Role
+import flask.ext.permissions.models as perms_models
 
 import app
 
@@ -15,7 +15,7 @@ class ApiTests(unittest.TestCase):
         self.app = app.app.test_client()
 
         app.db.create_all()
-        admin_role = Role('admin')
+        admin_role = perms_models.Role('admin')
         app.db.session.add(admin_role)
         app.db.session.commit()
         email = 'raddevon@gmail.com'
