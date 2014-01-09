@@ -95,19 +95,17 @@ class User(Resource):
         user = fetch_record(models.User, user_id)
         return ({'email': user.email, 'roles': user.roles})
 
-    # Getting "You do not have access" when testing this resource with cURL
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def put(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
-            if attribute == 'role':
+            if attribute == 'role' and value:
                 user.roles = [fetch_role(role)
                               for role in payload['role']]
             else:
                 user.attribute = payload[attribute]
-        print user.roles
         db.session.add(user)
         db.session.commit()
         user_dict = {'email': user.email}
@@ -138,7 +136,12 @@ class UserList(Resource):
     @user_is('admin', get_httpauth_user_record)
     def post(self):
         payload = user_parser.parse_args()
-        user = models.User(payload['email'], payload['password'])
+        user = models.User(
+            payload['email'], payload['password'])
+        for attribute, value in payload.iteritems():
+            if attribute == 'role' and value:
+                user.roles = [fetch_role(role)
+                              for role in payload['role']]
         db.session.add(user)
         db.session.commit()
         user_dict = {'email': user.email}
