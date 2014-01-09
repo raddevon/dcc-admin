@@ -91,7 +91,7 @@ class User(Resource):
     # Getting "You do not have access" when testing this resource with cURL
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def post(self, user_id):
+    def put(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
@@ -128,7 +128,7 @@ class UserList(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def put(self):
+    def post(self):
         payload = user_parser.parse_args()
         user = models.User(payload['email'], payload['password'])
         db.session.add(user)
