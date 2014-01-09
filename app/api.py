@@ -133,7 +133,8 @@ class UserList(Resource):
         user = models.User(payload['email'], payload['password'])
         db.session.add(user)
         db.session.commit()
-        return user, 201, {'Location': '/api/user/{}'.format(user.id)}
+        user_dict = {'email': user.email}
+        return user_dict, 201, {'Location': '/api/user/{}'.format(user.id)}
 
 
 class Role(Resource):
