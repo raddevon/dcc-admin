@@ -103,7 +103,8 @@ class User(Resource):
         print user.roles
         db.session.add(user)
         db.session.commit()
-        return user, 200
+        user_dict = {'email': user.email}
+        return user_dict, 200
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
