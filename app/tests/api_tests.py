@@ -21,6 +21,7 @@ class ApiTests(unittest.TestCase):
         email = 'raddevon@gmail.com'
         password = '1234567'
         new_user = models.User(email, password, 'admin')
+        app.db.session.add(new_user)
         app.db.session.commit()
 
         self.headers = {
