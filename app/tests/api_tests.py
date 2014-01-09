@@ -32,17 +32,23 @@ class ApiTests(unittest.TestCase):
         app.db.session.close()
         app.db.drop_all()
 
-    # def testAddImage(self):
-    #     self.app.get("/api/image")
-
-    def testGetUserEmpty(self):
+    def testInitialUser(self):
         response = self.app.get("/api/user/", headers=self.headers)
         print response.data
         self.assertEqual(response.headers["Content-Type"], "application/json")
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertEqual(data, {})
+        self.assertEqual(
+            data.itervalues().next()['email'], 'raddevon@gmail.com')
+        self.assertEqual(len(data), 1)
 
+    def testAddUser(self):
+        response = self.app.post(
+            '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567'}, headers=self.headers)
+        user = models.User.query.filter_by(email='test@gmail.com').first()
+        self.assertIsNotNone(user)
+        self.assertEqual(user.email, 'test@gmail.com')
+        self.assertEqual(response.status_code, 201)
 
 if __name__ == "__main__":
     unittest.main()
