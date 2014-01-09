@@ -50,5 +50,15 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(user.email, 'test@gmail.com')
         self.assertEqual(response.status_code, 201)
 
+    def testAddUserWithRole(self):
+        response = self.app.post(
+            '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567', 'role': 'admin'}, headers=self.headers)
+        user = models.User.query.filter_by(email='test@gmail.com').first()
+        role = perms_models.Role.query.filter_by(name='admin').first()
+        self.assertIsNotNone(user)
+        self.assertEqual(user.email, 'test@gmail.com')
+        self.assertIn(role, user.roles)
+        self.assertEqual(response.status_code, 201)
+
 if __name__ == "__main__":
     unittest.main()
