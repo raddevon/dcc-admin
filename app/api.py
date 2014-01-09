@@ -44,7 +44,7 @@ user_parser.add_argument(
 user_parser.add_argument(
     'password', type=str, required=True, help="Please provide a password for the user.")
 user_parser.add_argument(
-    'role', type=int, action='append', help="Optionally provide roles to be assigned to the user")
+    'role', type=str, action='append', help="Optionally provide the names of roles to be assigned to the user.")
 
 
 role_parser = reqparse.RequestParser()
@@ -57,6 +57,13 @@ def fetch_record(Model, id):
     if not fetched_record:
         abort(404, message="Requested record does not exist in the database.")
     return fetched_record
+
+
+def fetch_role(name):
+    fetched_role = perms_models.Role.query.filter_by(name=name).first()
+    if not fetched_role:
+        abort(404, message="Requested role does not exist in the database.")
+    return fetched_role
 
 
 class Node(Resource):
@@ -96,7 +103,7 @@ class User(Resource):
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
             if attribute == 'role':
-                user.roles = [fetch_record(perms_models.Roles, role)
+                user.roles = [fetch_role(role)
                               for role in payload['role']]
             else:
                 user.attribute = payload[attribute]
@@ -142,14 +149,14 @@ class Role(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def get(self, role_id):
-        user = fetch_record(perms_models.Role, role_id)
-        return ({'name': role.name, 'id': role.id})
+    def get(self, role_name):
+        role = fetch_record(perms_models.Role, role_name)
+        return ({'name': role.name, 'id': role.id}), 200
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def post(self, role_id):
-        role = fetch_record(perms_models.Role, role_id)
+    def post(self, role_name):
+        role = fetch_role(role_name)
         payload = role_parser.parse_args()
         for attribute, value in payload.iteritems():
             role.attribute = payload[attribute]
@@ -159,8 +166,8 @@ class Role(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def delete(self, role_id):
-        role = fetch_record(perms_models.Role, role_id)
+    def delete(self, role_name):
+        role = fetch_role(role_name)
         db.session.delete(role)
         db.session.commit()
         return '', 204
@@ -186,5 +193,5 @@ class RoleList(Resource):
 
 api.add_resource(User, '/api/user/<string:user_id>')
 api.add_resource(UserList, '/api/user/')
-api.add_resource(Role, '/api/role/<string:role_id>')
+api.add_resource(Role, '/api/role/<string:role_name>')
 api.add_resource(RoleList, '/api/role/')
