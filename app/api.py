@@ -129,7 +129,7 @@ class UserList(Resource):
         users_dict = {}
         for user in users:
             users_dict[user.id] = {
-                'email': user.email, 'roles': [{'name': role.name, 'id': role.id} for role in user.roles]}
+                'email': user.email, 'roles': [role.name for role in user.roles]}
         return users_dict, 200
 
     @auth.login_required
