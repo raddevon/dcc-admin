@@ -60,5 +60,19 @@ class ApiTests(unittest.TestCase):
         self.assertIn(role, user.roles)
         self.assertEqual(response.status_code, 201)
 
+    def testAddUserWithMultipleRoles(self):
+        user_role = perms_models.Role('user')
+        app.db.session.add(user_role)
+        app.db.session.commit()
+        response = self.app.post(
+            '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567', 'role': ['admin', 'user']}, headers=self.headers)
+        user = models.User.query.filter_by(email='test@gmail.com').first()
+        roles = [perms_models.Role.query.filter_by(
+            name='admin').first(), perms_models.Role.query.filter_by(name='user').first()]
+        self.assertIsNotNone(user)
+        self.assertEqual(user.email, 'test@gmail.com')
+        self.assertEqual(roles, user.roles)
+        self.assertEqual(response.status_code, 201)
+
 if __name__ == "__main__":
     unittest.main()
