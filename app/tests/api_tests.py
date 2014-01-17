@@ -43,6 +43,13 @@ class UserApiTests(ApiTests):
             data.itervalues().next()['email'], self.admin_email)
         self.assertEqual(len(data), 1)
 
+    def testGetUser(self):
+        print self.auth_headers
+        response = self.app.get('/api/user/1', headers=self.auth_headers)
+        user = response.data
+        print user
+        self.assertEqual(user['email'], 'raddevon@gmail.com')
+
     def testAddUser(self):
         response = self.app.post(
             '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567'}, headers=self.auth_headers)
