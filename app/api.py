@@ -93,6 +93,7 @@ class User(Resource):
     @user_is('admin', get_httpauth_user_record)
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
+        user.roles = [role.name for role in user.roles]
         return ({'email': user.email, 'roles': user.roles})
 
     @auth.login_required
@@ -154,7 +155,7 @@ class Role(Resource):
     @user_is('admin', get_httpauth_user_record)
     def get(self, role_name):
         role = fetch_record(perms_models.Role, role_name)
-        return ({'name': role.name, 'id': role.id}), 200
+        return ({'name': role.name}), 200
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
@@ -165,7 +166,7 @@ class Role(Resource):
             role.attribute = payload[attribute]
         db.session.add(role)
         db.session.commit()
-        return role, 200
+        return {'name': role.name}, 200
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
@@ -182,8 +183,7 @@ class RoleList(Resource):
     @user_is('admin', get_httpauth_user_record)
     def get(self):
         roles = perms_models.Role.query.all()
-        roles_dict = {role.id: role.name for role in roles}
-        return roles_dict, 200
+        return [role.name for role in roles], 200
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
@@ -192,7 +192,7 @@ class RoleList(Resource):
         role = perms_models.Role(payload['name'])
         db.session.add(role)
         db.session.commit()
-        return role, 201, {'Location': '/api/role/{}'.format(role.id)}
+        return role.name, 201, {'Location': '/api/role/{}'.format(role.name)}
 
 api.add_resource(User, '/api/user/<string:user_id>')
 api.add_resource(UserList, '/api/user/')
