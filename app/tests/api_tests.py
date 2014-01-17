@@ -32,7 +32,7 @@ class ApiTests(unittest.TestCase):
         app.db.drop_all()
 
 
-class UserApiTests(ApiTests):
+class UserListApiTests(ApiTests):
 
     def testInitialUser(self):
         response = self.app.get('/api/user/', headers=self.auth_headers)
@@ -42,13 +42,6 @@ class UserApiTests(ApiTests):
         self.assertEqual(
             data.itervalues().next()['email'], self.admin_email)
         self.assertEqual(len(data), 1)
-
-    def testGetUser(self):
-        print self.auth_headers
-        response = self.app.get('/api/user/1', headers=self.auth_headers)
-        user = response.data
-        print user
-        self.assertEqual(user['email'], 'raddevon@gmail.com')
 
     def testAddUser(self):
         response = self.app.post(
@@ -81,6 +74,16 @@ class UserApiTests(ApiTests):
         self.assertEqual(user.email, 'test@gmail.com')
         self.assertEqual(roles, user.roles)
         self.assertEqual(response.status_code, 201)
+
+
+class UserApiTests(ApiTests):
+
+    def testGetUser(self):
+        print self.auth_headers
+        response = self.app.get('/api/user/1', headers=self.auth_headers)
+        user = response.data
+        print user
+        self.assertEqual(user['email'], 'raddevon@gmail.com')
 
 
 # class RoleApiTests(ApiTests):
