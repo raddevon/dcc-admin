@@ -79,10 +79,8 @@ class UserListApiTests(ApiTests):
 class UserApiTests(ApiTests):
 
     def testGetUser(self):
-        print self.auth_headers
         response = self.app.get('/api/user/1', headers=self.auth_headers)
-        user = response.data
-        print user
+        user = json.loads(response.data)
         self.assertEqual(user['email'], self.admin_email)
 
 
