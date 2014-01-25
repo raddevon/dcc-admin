@@ -93,8 +93,8 @@ class User(Resource):
     @user_is('admin', get_httpauth_user_record)
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
-        user.roles = [role.name for role in user.roles]
-        return ({'email': user.email, 'roles': user.roles})
+        roles = [role.name for role in user.roles]
+        return {'email': user.email, 'roles': roles}
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
