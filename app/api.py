@@ -99,6 +99,7 @@ class User(Resource):
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def put(self, user_id):
+        print "inside put"
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
@@ -107,7 +108,10 @@ class User(Resource):
                               for role in payload['role']]
             else:
                 user.attribute = payload[attribute]
+        print "past for"
+        print 'id: {}, email: {}, password: {}, roles: {}'.format(user.id, user.email, user.pwdhash, user.roles)
         db.session.add(user)
+        print "user added"
         db.session.commit()
         user_dict = {'email': user.email}
         return user_dict, 200
