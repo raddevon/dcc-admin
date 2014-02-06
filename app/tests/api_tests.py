@@ -83,9 +83,25 @@ class UserApiTests(ApiTests):
         user = json.loads(response.data)
         self.assertEqual(user['email'], self.admin_email)
 
+    def testChangeExistingUser(self):
+        user_role = perms_models.Role('user')
+        app.db.session.add(user_role)
+        app.db.session.commit()
+        new_user = models.User('start@mail.com', '1234567', 'user')
+        app.db.session.add(new_user)
+        app.db.session.commit()
+        user_changes = {'email': 'end@mail.com',
+                        'password': '7654321', 'role': ['user', 'admin']}
+        response = self.app.put(
+            '/api/user/' + str(new_user.id), data=user_changes, headers=self.auth_headers)
+        user = models.User.query.get(new_user.id)
+        self.assertEqual(user.email, user_changes['email'])
+        self.assertTrue(user.check_password(user_changes['password']))
+        roles = [role.name for role in user.roles]
+        self.assertEqual(roles, user_changes.roles)
+
 
 # class RoleApiTests(ApiTests):
-
 #     def testInitialUser(self):
 #         response = self.app.get("/api/user/", headers=self.headers)
 #         print response.data
@@ -95,7 +111,6 @@ class UserApiTests(ApiTests):
 #         self.assertEqual(
 #             data.itervalues().next()['email'], 'raddevon@gmail.com')
 #         self.assertEqual(len(data), 1)
-
 #     def testAddUser(self):
 #         response = self.app.post(
 #             '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567'}, headers=self.headers)
@@ -103,7 +118,6 @@ class UserApiTests(ApiTests):
 #         self.assertIsNotNone(user)
 #         self.assertEqual(user.email, 'test@gmail.com')
 #         self.assertEqual(response.status_code, 201)
-
 #     def testAddUserWithRole(self):
 #         response = self.app.post(
 #             '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567', 'role': 'admin'}, headers=self.headers)
@@ -113,7 +127,6 @@ class UserApiTests(ApiTests):
 #         self.assertEqual(user.email, 'test@gmail.com')
 #         self.assertIn(role, user.roles)
 #         self.assertEqual(response.status_code, 201)
-
 #     def testAddUserWithMultipleRoles(self):
 #         user_role = perms_models.Role('user')
 #         app.db.session.add(user_role)
@@ -127,6 +140,5 @@ class UserApiTests(ApiTests):
 #         self.assertEqual(user.email, 'test@gmail.com')
 #         self.assertEqual(roles, user.roles)
 #         self.assertEqual(response.status_code, 201)
-
 if __name__ == "__main__":
     unittest.main()
