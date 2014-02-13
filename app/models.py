@@ -2,6 +2,8 @@ from werkzeug import generate_password_hash, check_password_hash
 from utils import is_sequence
 from app import db
 from flask.ext.permissions.models import UserMixin
+from app.utils import fetch_role
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class User(UserMixin):
@@ -10,10 +12,15 @@ class User(UserMixin):
 
     def __init__(self, email, password, roles=None):
         self.email = email.lower()
-        self.set_password(password)
+        self.password = password
         UserMixin.__init__(self, roles)
 
-    def set_password(self, password):
+    @property
+    def password(self):
+        raise AttributeError('The user\'s password is not stored.')
+
+    @password.setter
+    def password(self, password):
         self.pwdhash = generate_password_hash(password)
 
     def check_password(self, password):
