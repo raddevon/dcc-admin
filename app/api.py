@@ -6,6 +6,7 @@ from flask.ext.httpauth import HTTPBasicAuth
 from flask.ext.permissions.decorators import user_is
 from werkzeug import generate_password_hash, check_password_hash
 import app.models as models
+from app.utils import fetch_record, fetch_role
 
 api = Api(app)
 
@@ -50,20 +51,6 @@ user_parser.add_argument(
 role_parser = reqparse.RequestParser()
 role_parser.add_argument(
     'name', type=str, required=True, help="Each role needs a name.")
-
-
-def fetch_record(Model, id):
-    fetched_record = Model.query.get(id)
-    if not fetched_record:
-        abort(404, message="Requested record does not exist in the database.")
-    return fetched_record
-
-
-def fetch_role(name):
-    fetched_role = perms_models.Role.query.filter_by(name=name).first()
-    if not fetched_role:
-        abort(404, message="Requested role does not exist in the database.")
-    return fetched_role
 
 
 class Node(Resource):
