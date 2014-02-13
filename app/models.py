@@ -23,6 +23,14 @@ class User(UserMixin):
     def password(self, password):
         self.pwdhash = generate_password_hash(password)
 
+    @hybrid_property
+    def assigned_roles(self):
+        return [role.name for role in self.roles]
+
+    @assigned_roles.setter
+    def assigned_roles(self, roles):
+        self.roles = [fetch_role(role) for role in roles]
+
     def check_password(self, password):
         return check_password_hash(self.pwdhash, password)
 
