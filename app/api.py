@@ -45,7 +45,7 @@ user_parser.add_argument(
 user_parser.add_argument(
     'password', type=str, required=True, help="Please provide a password for the user.")
 user_parser.add_argument(
-    'role', type=str, action='append', help="Optionally provide the names of roles to be assigned to the user.")
+    'assigned_roles', type=str, action='append', help="Optionally provide the names of roles to be assigned to the user.")
 
 
 role_parser = reqparse.RequestParser()
@@ -80,25 +80,15 @@ class User(Resource):
     @user_is('admin', get_httpauth_user_record)
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
-        roles = [role.name for role in user.roles]
-        return {'email': user.email, 'roles': roles}
+        return {'email': user.email, 'roles': user.assigned_roles}
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def put(self, user_id):
-        print "inside put"
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
         for attribute, value in payload.iteritems():
-            if attribute == 'role' and value:
-                user.roles = [fetch_role(role)
-                              for role in payload['role']]
-            else:
-                user.attribute = payload[attribute]
-        print "past for"
-        print 'id: {}, email: {}, password: {}, roles: {}'.format(user.id, user.email, user.pwdhash, user.roles)
-        db.session.add(user)
-        print "user added"
+            setattr(user, attribute, payload[attribute])
         db.session.commit()
         user_dict = {'email': user.email}
         return user_dict, 200
@@ -121,7 +111,7 @@ class UserList(Resource):
         users_dict = {}
         for user in users:
             users_dict[user.id] = {
-                'email': user.email, 'roles': [role.name for role in user.roles]}
+                'email': user.email, 'roles': user.assigned_roles}
         return users_dict, 200
 
     @auth.login_required
@@ -129,11 +119,7 @@ class UserList(Resource):
     def post(self):
         payload = user_parser.parse_args()
         user = models.User(
-            payload['email'], payload['password'])
-        for attribute, value in payload.iteritems():
-            if attribute == 'role' and value:
-                user.roles = [fetch_role(role)
-                              for role in payload['role']]
+            payload['email'], payload['password'], payload['assigned_roles'])
         db.session.add(user)
         db.session.commit()
         user_dict = {'email': user.email}
@@ -145,7 +131,7 @@ class Role(Resource):
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def get(self, role_name):
-        role = fetch_record(perms_models.Role, role_name)
+        role = fetch_role(role_name)
         return ({'name': role.name}), 200
 
     @auth.login_required
