@@ -7,9 +7,35 @@ from flask.ext.permissions.decorators import user_is
 from werkzeug import generate_password_hash, check_password_hash
 import app.models as models
 from app.utils import fetch_record, fetch_role
+from functools import wraps
+import json
+from flask import request
 
 api = Api(app)
 
+def accept_json(func):
+    """
+    Decorator which returns a 406 Not Acceptable if the client won't accept JSON
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        accept = api.mediatypes()
+        if "*/*" in accept or "application/json" in accept:
+            return func(*args, **kwargs)
+        return {"message": "Request must accept JSON"}, 406
+    return wrapper
+
+def require_json(func):
+    """
+    Decorator which returns a 415 Unsupported Media Type if the client sends
+    something other than JSON
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if request.mimetype ==  "application/json":
+            return func(*args, **kwargs)
+        return {"message": "Request must contain JSON"}, 415
+    return wrapper
 
 class HTTPWerkzeugBasicAuth(HTTPBasicAuth):
 
@@ -41,16 +67,16 @@ def hash_pw(password):
 
 user_parser = reqparse.RequestParser()
 user_parser.add_argument(
-    'email', type=str, required=True, help="Please provide an email address for the user.")
+    'email', type=str, required=True, help="Please provide an email address for the user.", location="get_json")
 user_parser.add_argument(
-    'password', type=str, required=True, help="Please provide a password for the user.")
+    'password', type=str, required=True, help="Please provide a password for the user.", location="get_json")
 user_parser.add_argument(
-    'assigned_roles', type=str, action='append', help="Optionally provide the names of roles to be assigned to the user.")
+    'roles', type=str, help="Optionally provide the names of roles to be assigned to the user.", location="get_json")
 
 
 role_parser = reqparse.RequestParser()
 role_parser.add_argument(
-    'name', type=str, required=True, help="Each role needs a name.")
+    'name', type=str, required=True, help="Each role needs a name.", location="get_json")
 
 
 class Node(Resource):
@@ -80,10 +106,11 @@ class User(Resource):
     @user_is('admin', get_httpauth_user_record)
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
-        return {'email': user.email, 'roles': user.assigned_roles}
+        return {'email': user.email, 'roles': user.roles}
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
+    @require_json
     def put(self, user_id):
         user = fetch_record(models.User, user_id)
         payload = user_parser.parse_args()
@@ -111,7 +138,7 @@ class UserList(Resource):
         users_dict = {}
         for user in users:
             users_dict[user.id] = {
-                'email': user.email, 'roles': user.assigned_roles}
+                'email': user.email, 'roles': user.roles}
         return users_dict, 200
 
     @auth.login_required
