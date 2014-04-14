@@ -24,7 +24,8 @@ class ApiTests(unittest.TestCase):
         app.db.session.commit()
 
         self.auth_headers = {
-            'Authorization': 'Basic ' + b64encode('{0}:{1}'.format(self.admin_email, self.admin_password))
+            'Authorization': 'Basic ' + b64encode('{0}:{1}'.format(self.admin_email, self.admin_password)),
+            "Accept": "application/json"
         }
 
     def tearDown(self):
@@ -45,7 +46,7 @@ class UserListApiTests(ApiTests):
 
     def testAddUser(self):
         response = self.app.post(
-            '/api/user/', data=json.dumps({'email': 'test@gmail.com', 'password': '1234567'}), headers=self.auth_headers)
+            '/api/user/', data=json.dumps({'email': 'test@gmail.com', 'password': '1234567'}), headers=self.auth_headers, content_type="application/json")
         user = models.User.query.filter_by(email='test@gmail.com').first()
         self.assertIsNotNone(user)
         self.assertEqual(user.email, 'test@gmail.com')
@@ -53,12 +54,11 @@ class UserListApiTests(ApiTests):
 
     def testAddUserWithRole(self):
         response = self.app.post(
-            '/api/user/', data=json.dumps({'email': 'test@gmail.com', 'password': '1234567', 'roles': 'admin'}), headers=self.auth_headers)
+            '/api/user/', data=json.dumps({'email': 'test@gmail.com', 'password': '1234567', 'roles': ['admin']}), headers=self.auth_headers, content_type="application/json")
         user = models.User.query.filter_by(email='test@gmail.com').first()
-        role = perms_models.Role.query.filter_by(name='admin').first()
         self.assertIsNotNone(user)
         self.assertEqual(user.email, 'test@gmail.com')
-        self.assertIn(role, user.roles)
+        self.assertIn('admin', user.roles)
         self.assertEqual(response.status_code, 201)
 
     def testAddUserWithMultipleRoles(self):
@@ -67,7 +67,7 @@ class UserListApiTests(ApiTests):
         app.db.session.commit()
         roles = ['admin', 'user']
         response = self.app.post(
-            '/api/user/', data=json.dumps({'email': 'test@gmail.com', 'password': '1234567', 'roles': roles}), headers=self.auth_headers)
+            '/api/user/', data=json.dumps({'email': 'test@gmail.com', 'password': '1234567', 'roles': roles}), headers=self.auth_headers, content_type="application/json")
         user = models.User.query.filter_by(email='test@gmail.com').first()
         self.assertIsNotNone(user)
         self.assertEqual(user.email, 'test@gmail.com')
@@ -80,7 +80,6 @@ class UserApiTests(ApiTests):
     def testGetUser(self):
         response = self.app.get('/api/user/1', headers=self.auth_headers)
         user = json.loads(response.data)
-        print '\nUser: {}:'.format(user)
         self.assertEqual(user['email'], self.admin_email)
 
     def testChangeExistingUser(self):
@@ -91,54 +90,41 @@ class UserApiTests(ApiTests):
         app.db.session.add(new_user)
         app.db.session.commit()
         user_changes = json.dumps({'email': 'end@mail.com',
-                        'password': '7654321', 'roles': ['user', 'admin']})
+                                   'password': '7654321', 'roles': ['user', 'admin']})
         response = self.app.put(
-            '/api/user/' + str(new_user.id), data=user_changes, headers=self.auth_headers)
+            '/api/user/' + str(new_user.id), data=user_changes, headers=self.auth_headers, content_type="application/json")
         user = models.User.query.get(new_user.id)
         self.assertEqual(user.email, json.loads(user_changes)['email'])
-        self.assertTrue(user.check_password(json.loads(user_changes)['password']))
+        self.assertTrue(
+            user.check_password(json.loads(user_changes)['password']))
         self.assertItemsEqual(
             user.roles, json.loads(user_changes)['roles'])
 
 
-# class RoleApiTests(ApiTests):
-#     def testInitialUser(self):
-#         response = self.app.get("/api/user/", headers=self.headers)
-#         print response.data
-#         self.assertEqual(response.headers["Content-Type"], "application/json")
-#         self.assertEqual(response.status_code, 200)
-#         data = json.loads(response.data)
-#         self.assertEqual(
-#             data.itervalues().next()['email'], 'raddevon@gmail.com')
-#         self.assertEqual(len(data), 1)
-#     def testAddUser(self):
-#         response = self.app.post(
-#             '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567'}, headers=self.headers)
-#         user = models.User.query.filter_by(email='test@gmail.com').first()
-#         self.assertIsNotNone(user)
-#         self.assertEqual(user.email, 'test@gmail.com')
-#         self.assertEqual(response.status_code, 201)
-#     def testAddUserWithRole(self):
-#         response = self.app.post(
-#             '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567', 'role': 'admin'}, headers=self.headers)
-#         user = models.User.query.filter_by(email='test@gmail.com').first()
-#         role = perms_models.Role.query.filter_by(name='admin').first()
-#         self.assertIsNotNone(user)
-#         self.assertEqual(user.email, 'test@gmail.com')
-#         self.assertIn(role, user.roles)
-#         self.assertEqual(response.status_code, 201)
-#     def testAddUserWithMultipleRoles(self):
-#         user_role = perms_models.Role('user')
-#         app.db.session.add(user_role)
-#         app.db.session.commit()
-#         response = self.app.post(
-#             '/api/user/', data={'email': 'test@gmail.com', 'password': '1234567', 'role': ['admin', 'user']}, headers=self.headers)
-#         user = models.User.query.filter_by(email='test@gmail.com').first()
-#         roles = [perms_models.Role.query.filter_by(
-#             name='admin').first(), perms_models.Role.query.filter_by(name='user').first()]
-#         self.assertIsNotNone(user)
-#         self.assertEqual(user.email, 'test@gmail.com')
-#         self.assertEqual(roles, user.roles)
-#         self.assertEqual(response.status_code, 201)
+class RoleListApiTests(ApiTests):
+
+    def testAddRole(self):
+        response = self.app.post(
+            '/api/role/', data=json.dumps({'name': 'test'}), headers=self.auth_headers)
+        print "JSON dump: {}".format(json.dumps({'name': 'test'}))
+        role = perms_models.Role.query.filter_by(name='test').first()
+        self.assertIsNotNone(role)
+        self.assertEqual(role.name, 'test')
+        self.assertEqual(response.status_code, 201)
+
+    def testGetRoles(self):
+        roles = [perms_models.Role('writer'), perms_models.Role(
+            'moderator'), perms_models.Role('editor')]
+        for role in roles:
+            app.db.session.add(role)
+        app.db.session.commit()
+        response = self.app.get('/api/role/', headers=self.auth_headers)
+        returned_names = json.loads(response.data)
+        role_names = [role.name for role in roles]
+        self.assertIsNotNone(returned_names)
+        self.assertItemsEqual(role_names, returned_names)
+        self.assertEqual(response.status_code, 201)
+
+
 if __name__ == "__main__":
     unittest.main()
