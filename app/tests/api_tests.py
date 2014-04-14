@@ -105,8 +105,7 @@ class RoleListApiTests(ApiTests):
 
     def testAddRole(self):
         response = self.app.post(
-            '/api/role/', data=json.dumps({'name': 'test'}), headers=self.auth_headers)
-        print "JSON dump: {}".format(json.dumps({'name': 'test'}))
+            '/api/role/', data=json.dumps({'name': 'test'}), headers=self.auth_headers, content_type="application/json")
         role = perms_models.Role.query.filter_by(name='test').first()
         self.assertIsNotNone(role)
         self.assertEqual(role.name, 'test')
@@ -118,12 +117,44 @@ class RoleListApiTests(ApiTests):
         for role in roles:
             app.db.session.add(role)
         app.db.session.commit()
-        response = self.app.get('/api/role/', headers=self.auth_headers)
-        returned_names = json.loads(response.data)
+        response = self.app.get(
+            '/api/role/', headers=self.auth_headers, content_type="application/json")
         role_names = [role.name for role in roles]
+        role_names.append('admin')
+        returned_names = json.loads(response.data)
         self.assertIsNotNone(returned_names)
         self.assertItemsEqual(role_names, returned_names)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
+
+
+class RoleApiTests(ApiTests):
+
+    def testGetRole(self):
+            response = self.app.get(
+                '/api/role/admin', headers=self.auth_headers)
+            role = json.loads(response.data)
+            self.assertEqual(role['name'], 'admin')
+
+    def testChangeExistingRole(self):
+        user_role = perms_models.Role('user')
+        app.db.session.add(user_role)
+        app.db.session.commit()
+        role_changes = json.dumps({'name': 'contributor'})
+        response = self.app.put(
+            '/api/role/user', data=role_changes, headers=self.auth_headers, content_type="application/json")
+        role = perms_models.Role.query.filter_by(name='contributor')
+        self.assertIsNotNone(role)
+
+    def testDeleteRole(self):
+        user_role = perms_models.Role('user')
+        app.db.session.add(user_role)
+        app.db.session.commit()
+        role = perms_models.Role.query.filter_by(name='user')
+        self.assertIsNotNone(role)
+        response = self.app.delete(
+            '/api/role/user', headers=self.auth_headers, content_type="application/json")
+        role = perms_models.Role.query.filter_by(name='user').first()
+        self.assertIsNone(role)
 
 
 if __name__ == "__main__":

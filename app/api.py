@@ -207,10 +207,7 @@ class RoleList(Resource):
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def post(self):
-        print "Into the API function"
-        print request.get_json()
         payload = role_parser.parse_args()
-        print "Payload: {}".format(payload)
         role = perms_models.Role(payload['name'])
         db.session.add(role)
         db.session.commit()
