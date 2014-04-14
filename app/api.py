@@ -84,6 +84,8 @@ role_parser.add_argument(
 
 class Node(Resource):
 
+    method_decorators = [accept_json]
+
     def get(self, node_id):
         pass
 
@@ -99,17 +101,21 @@ class Node(Resource):
 
 class NodeList(Resource):
 
+    method_decorators = [accept_json]
+
     def get(self):
         pass
 
 
 class User(Resource):
 
+    method_decorators = [accept_json]
+
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def get(self, user_id):
         user = fetch_record(models.User, user_id)
-        return {'email': user.email, 'roles': user.roles}
+        return {'email': user.email, 'roles': list(user.roles)}
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
@@ -134,6 +140,8 @@ class User(Resource):
 
 class UserList(Resource):
 
+    method_decorators = [accept_json]
+
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def get(self):
@@ -141,7 +149,7 @@ class UserList(Resource):
         users_dict = {}
         for user in users:
             users_dict[user.id] = {
-                'email': user.email, 'roles': user.roles}
+                'email': user.email, 'roles': list(user.roles)}
         return users_dict, 200
 
     @auth.login_required
@@ -149,7 +157,7 @@ class UserList(Resource):
     def post(self):
         payload = user_parser.parse_args()
         user = models.User(
-            payload['email'], payload['password'], payload['assigned_roles'])
+            payload['email'], payload['password'], payload['roles'])
         db.session.add(user)
         db.session.commit()
         user_dict = {'email': user.email}
@@ -157,6 +165,8 @@ class UserList(Resource):
 
 
 class Role(Resource):
+
+    method_decorators = [accept_json]
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
@@ -166,7 +176,7 @@ class Role(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def post(self, role_name):
+    def put(self, role_name):
         role = fetch_role(role_name)
         payload = role_parser.parse_args()
         for attribute, value in payload.iteritems():
@@ -186,6 +196,8 @@ class Role(Resource):
 
 class RoleList(Resource):
 
+    method_decorators = [accept_json]
+
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
     def get(self):
@@ -194,8 +206,11 @@ class RoleList(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
-    def put(self):
+    def post(self):
+        print "Into the API function"
+        print request.get_json()
         payload = role_parser.parse_args()
+        print "Payload: {}".format(payload)
         role = perms_models.Role(payload['name'])
         db.session.add(role)
         db.session.commit()
