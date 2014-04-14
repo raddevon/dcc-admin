@@ -13,6 +13,7 @@ from flask import request
 
 api = Api(app)
 
+
 def accept_json(func):
     """
     Decorator which returns a 406 Not Acceptable if the client won't accept JSON
@@ -25,6 +26,7 @@ def accept_json(func):
         return {"message": "Request must accept JSON"}, 406
     return wrapper
 
+
 def require_json(func):
     """
     Decorator which returns a 415 Unsupported Media Type if the client sends
@@ -32,10 +34,11 @@ def require_json(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if request.mimetype ==  "application/json":
+        if request.mimetype == "application/json":
             return func(*args, **kwargs)
         return {"message": "Request must contain JSON"}, 415
     return wrapper
+
 
 class HTTPWerkzeugBasicAuth(HTTPBasicAuth):
 
@@ -71,7 +74,7 @@ user_parser.add_argument(
 user_parser.add_argument(
     'password', type=str, required=True, help="Please provide a password for the user.", location="get_json")
 user_parser.add_argument(
-    'roles', type=str, help="Optionally provide the names of roles to be assigned to the user.", location="get_json")
+    'roles', type=list, help="Optionally provide the names of roles to be assigned to the user.", location="get_json")
 
 
 role_parser = reqparse.RequestParser()
