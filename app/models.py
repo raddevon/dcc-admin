@@ -10,6 +10,10 @@ class User(UserMixin):
     email = db.Column(db.String(120), unique=True)
     pwdhash = db.Column(db.String(100))
 
+    __mapper_args__ = {
+        'polymorphic_identity': 'user'
+    }
+
     def __init__(self, email, password, roles=None):
         self.email = email.lower()
         self.password = password
