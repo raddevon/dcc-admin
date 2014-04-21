@@ -100,6 +100,15 @@ class UserApiTests(ApiTests):
         self.assertItemsEqual(
             user.roles, json.loads(user_changes)['roles'])
 
+    def testDeleteUser(self):
+        new_user = models.User('start@mail.com', '1234567')
+        app.db.session.add(new_user)
+        app.db.session.commit()
+        response = self.app.delete(
+            '/api/user/' + str(new_user.id), headers=self.auth_headers, content_type="application/json")
+        user = models.User.query.get(new_user.id)
+        self.assertIsNone(user)
+
 
 class RoleListApiTests(ApiTests):
 
