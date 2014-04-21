@@ -166,5 +166,64 @@ class RoleApiTests(ApiTests):
         self.assertIsNone(role)
 
 
+class NodeListApiTests(ApiTests):
+
+    def testAddNode(self):
+        response = self.app.post(
+            '/api/node/', data=json.dumps({'name': 'test'}), headers=self.auth_headers, content_type="application/json")
+        node = models.Node.query.filter_by(name='test').first()
+        self.assertIsNotNone(node)
+        self.assertEqual(node.name, 'test')
+        self.assertEqual(response.status_code, 201)
+
+    def testGetNodes(self):
+        nodes = [models.Node('Motion sensor'), models.Node(
+            'Noise sensor'), models.Node('Door sensor')]
+        for node in nodes:
+            app.db.session.add(node)
+        app.db.session.commit()
+        response = self.app.get(
+            '/api/node/', headers=self.auth_headers, content_type="application/json")
+        node_names = [node.name for node in nodes]
+        returned_names = json.loads(response.data)
+        self.assertIsNotNone(returned_names)
+        self.assertItemsEqual(node_names, returned_names)
+        self.assertEqual(response.status_code, 200)
+
+
+class NodeApiTests(ApiTests):
+
+    def testGetNode(self):
+        node = models.Node('test')
+        app.db.session.add(node)
+        app.db.session.commit()
+        response = self.app.get(
+            '/api/node/1', headers=self.auth_headers)
+        node = json.loads(response.data)
+        self.assertEqual(node['name'], 'test')
+
+    def testChangeExistingNode(self):
+        test_node = models.Node(
+            'Motion sensor', True, 'Motion sensor node above the entry door')
+        app.db.session.add(test_node)
+        app.db.session.commit()
+        node_changes = json.dumps(
+            {'name': 'Door sensor', 'on': False, 'description': 'Door open/closed sensor'})
+        response = self.app.put(
+            '/api/node/1', data=node_changes, headers=self.auth_headers, content_type="application/json")
+        node = models.Node.query.filter_by(name='Door sensor')
+        self.assertIsNotNone(node)
+
+    def testDeleteNode(self):
+        test_node = models.Node('test')
+        app.db.session.add(test_node)
+        app.db.session.commit()
+        node = models.Node.query.filter_by(name='test')
+        self.assertIsNotNone(node)
+        response = self.app.delete(
+            '/api/node/1', headers=self.auth_headers, content_type="application/json")
+        node = models.Node.query.filter_by(name='test').first()
+        self.assertIsNone(node)
+
 if __name__ == "__main__":
     unittest.main()
