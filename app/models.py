@@ -38,11 +38,23 @@ class User(UserMixin):
 
 
 class Node(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150))
     description = db.Column(db.Text())
     on = db.Column(db.Boolean)
+
+    __tablename__ = 'node'
 
     def __init__(self, name, on=False, description=None):
         self.name = name
         self.on = on
         self.description = description
+
+    def toggle(self):
+        self.on = not self.on
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<Node {}>".format(self.id)
