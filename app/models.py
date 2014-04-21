@@ -35,3 +35,14 @@ class User(UserMixin):
 
     def __repr__(self):
         return "<User {}>".format(user.email)
+
+
+class Node(db.Model):
+    name = db.Column(db.String(150))
+    description = db.Column(db.Text())
+    on = db.Column(db.Boolean)
+
+    def __init__(self, name, on=False, description=None):
+        self.name = name
+        self.on = on
+        self.description = description
