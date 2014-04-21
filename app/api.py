@@ -81,30 +81,13 @@ role_parser = reqparse.RequestParser()
 role_parser.add_argument(
     'name', type=str, required=True, help="Each role needs a name.", location="get_json")
 
-
-class Node(Resource):
-
-    method_decorators = [accept_json]
-
-    def get(self, node_id):
-        pass
-
-    def put(self):
-        pass
-
-    def delete(self):
-        pass
-
-
-class NodeList(Resource):
-
-    method_decorators = [accept_json]
-
-    def get(self):
-        pass
-
-    def post(self):
-        pass
+node_parser = reqparse.RequestParser()
+node_parser.add_argument(
+    'name', type=str, required=True, help="Each node needs a name.", location="get_json")
+node_parser.add_argument(
+    'description', type=str, help="Optionally describe the node.", location="get_json")
+node_parser.add_argument(
+    'on', type=bool, help="Set on to true to start this node in the on state. (Defaults to off.)", location="get_json")
 
 
 class User(Resource):
@@ -215,7 +198,61 @@ class RoleList(Resource):
         db.session.commit()
         return role.name, 201, {'Location': '/api/role/{}'.format(role.name)}
 
+
+class Node(Resource):
+
+    method_decorators = [accept_json]
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def get(self, node_id):
+        node = fetch_record(models.Node, node_id)
+        return ({'name': node.name, 'id': node.id, 'description': node.description, 'on': node.on}), 200
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    @require_json
+    def put(self, node_id):
+        node = fetch_record(models.Node, node_id)
+        payload = node_parser.parse_args()
+        for attribute, value in payload.iteritems():
+            node.attribute = payload[attribute]
+        db.session.add(node)
+        db.session.commit()
+        return {'name': node.name}, 200
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def delete(self, node_id):
+        node = fetch_record(models.Node, node_id)
+        db.session.delete(node)
+        db.session.commit()
+        return '', 204
+
+
+class NodeList(Resource):
+    method_decorators = [accept_json]
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    def get(self):
+        nodes = models.Node.query.all()
+        return [node.name for node in nodes], 200
+
+    @auth.login_required
+    @user_is('admin', get_httpauth_user_record)
+    @require_json
+    def post(self):
+        payload = node_parser.parse_args()
+        node = models.Node(
+            payload['name'], payload['on'], payload['description'])
+        db.session.add(node)
+        db.session.commit()
+        return node.name, 201, {'Location': '/api/node/{}'.format(node.id)}
+
 api.add_resource(User, '/api/user/<string:user_id>')
 api.add_resource(UserList, '/api/user/')
 api.add_resource(Role, '/api/role/<string:role_name>')
 api.add_resource(RoleList, '/api/role/')
+api.add_resource(Node, '/api/node/<string:node_id>')
+api.add_resource(NodeList, '/api/node/')
