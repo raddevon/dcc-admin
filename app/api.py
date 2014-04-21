@@ -92,9 +92,6 @@ class Node(Resource):
     def put(self):
         pass
 
-    def post(self):
-        pass
-
     def delete(self):
         pass
 
@@ -104,6 +101,9 @@ class NodeList(Resource):
     method_decorators = [accept_json]
 
     def get(self):
+        pass
+
+    def post(self):
         pass
 
 
