@@ -176,6 +176,7 @@ class Role(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
+    @require_json
     def put(self, role_name):
         role = fetch_role(role_name)
         payload = role_parser.parse_args()
@@ -206,6 +207,7 @@ class RoleList(Resource):
 
     @auth.login_required
     @user_is('admin', get_httpauth_user_record)
+    @require_json
     def post(self):
         payload = role_parser.parse_args()
         role = perms_models.Role(payload['name'])
